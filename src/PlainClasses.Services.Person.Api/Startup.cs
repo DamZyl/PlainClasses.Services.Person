@@ -3,6 +3,7 @@ using Autofac.Extensions.DependencyInjection;
 using Hellang.Middleware.ProblemDetails;
 using MicroserviceLibrary.Api.Configurations.Extensions;
 using MicroserviceLibrary.Api.Utils;
+using MicroserviceLibrary.Infrastructure.Databases;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -21,11 +22,12 @@ namespace PlainClasses.Services.Person.Api
         {
             Configuration = configuration;
         }
-        
+
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services.AddSqlConfiguration(Configuration, Consts.DbConfigurationSection);
             services.AddDbContext<PersonContext>();
+            services.AddScoped(typeof(IApplicationDbContext), typeof(PersonContext));
             
             services.AddControllers();
             services.AddSwagger();
