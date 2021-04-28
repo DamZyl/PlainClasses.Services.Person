@@ -1,3 +1,4 @@
+using MassTransit;
 using System;
 using Autofac.Extensions.DependencyInjection;
 using Hellang.Middleware.ProblemDetails;
@@ -33,6 +34,20 @@ namespace PlainClasses.Services.Person.Api
             services.AddSwagger();
            
             services.AddErrorHandler();
+            
+            services.AddMassTransit(x =>
+            {
+                x.AddBus(provider => Bus.Factory.CreateUsingRabbitMq(config =>
+                {
+                    config.UseHealthCheck(provider);
+                    config.Host(new Uri("rabbitmq://localhost"), h =>
+                    {
+                        h.Username("guest");
+                        h.Password("guest");
+                    });
+                }));
+            });
+            services.AddMassTransitHostedService();
             
             return new AutofacServiceProvider(AutofacServiceExtension.CreateContainer(services, Configuration, 
                 AssembliesConst.MigrationAssembly, AssembliesConst.ApplicationAssembly)); 
